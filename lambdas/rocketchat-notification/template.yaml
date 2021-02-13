@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Test SAM App for local Dev"
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  SecurityHubFindingsToRocketchat:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: python3.8
+      Timeout: 120
+      Environment:
+        Variables:
+          IncomingWebHookUrl:
+          LOG_LEVEL: INFO
+
+
+
+# Build: sam build --use-container -b ./build
+# Package: zip -r ../../../../builds/securityhubfindings-to-rocketchat.zip *
+# DebugLocal: sam local invoke --env-vars env.json -e events.json -t build/template.yaml       
