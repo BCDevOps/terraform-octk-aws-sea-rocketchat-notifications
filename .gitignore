@@ -44,9 +44,10 @@ Thumbs.db
 #############
 .vscode/
 
-# IDE Files #
+# Build Files #
 #############
 builds/
+*.toml
 
 # idea files
 **/.idea/*
