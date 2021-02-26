@@ -17,9 +17,3 @@ Resources:
         Variables:
           IncomingWebHookUrl:
           LOG_LEVEL: INFO
-
-
-
-# Build (run inside lambdas/rocketchat-notification folder): sam build --use-container -b ../../builds
-# Package (run iside builds folder): zip -r securityhubfindings-to-rocketchat.zip *
-# DebugLocal (run inside builds folder): sam local invoke --env-vars env.json -e events.json -t template.yaml       
