@@ -90,12 +90,12 @@ resource "aws_cloudwatch_event_rule" "security_hub_findings_to_rocketchat" {
       "findings": {
           "Severity": {
               "Label": [
-                  "HIGH", "CRITICAL"
+                  "HIGH", "CRITICAL", "MEDIUM", "LOW"
               ]
           },
           "ProductFields": {
               "aws/securityhub/ProductName": [
-                  "GuardDuty"
+                  "GuardDuty", "Macie", "IAM Access Analyzer", "Inspector", "Firewall Manager", "Systems Manager Patch Manager"
               ]
           }
       }
