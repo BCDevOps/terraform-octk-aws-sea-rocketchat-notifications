@@ -3,6 +3,7 @@
 
 # AWS SEA Notifications to Rocket.Chat
 
+
 A serveless application to send AWS SEA (Secure Environment Accelerator) Budget and Security notifications to Rocket.Chat (RC).  
 
 ## Introduction
