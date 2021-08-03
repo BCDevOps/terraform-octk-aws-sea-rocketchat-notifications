@@ -1,6 +1,7 @@
 variable "aws_region" {
   type        = string
   description = "The AWS region things are created in"
+  default = "ca-central-1"
 }
 
 variable "IncomingWebHookUrl" {
@@ -10,8 +11,10 @@ variable "IncomingWebHookUrl" {
 
 variable "LambdaEnvLogLevel" {
     type = string
+    default = "INFO"
 }
 
 variable "LambdaTimeout" {
     type    = number
+    default = 30
 }

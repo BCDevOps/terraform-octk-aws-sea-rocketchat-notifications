@@ -17,6 +17,8 @@ locals {
   }  
 }
 
+
+
 resource "aws_iam_role" "security_hub_to_rocketchat_role" {
   name = "security_hub_to_rocketchat_role"
   path = "/service-role/"
@@ -51,14 +53,24 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "null_resource" "sam_execute" {
+
+ provisioner "local-exec" {
+
+    command = "/bin/bash ../../lambdas/rocketchat-notification/auto.sh"
+  }
+}
+
 # Lambda
 resource "aws_lambda_function" "findings_to_rocketchat" {
+  depends_on = ["null_resource.sam_execute"]
   filename      = "../../builds/securityhubfindings-to-rocketchat.zip"
   function_name = "sea-send-securityhubfindings-to-rocketchat"
   role          = aws_iam_role.security_hub_to_rocketchat_role.arn
   handler       = "index.handler"
+  
 
-  source_code_hash = filebase64sha256("../../builds/securityhubfindings-to-rocketchat.zip")
+  
   runtime = "python3.8"
   timeout = var.LambdaTimeout
 
