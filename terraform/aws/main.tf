@@ -57,7 +57,7 @@ resource "null_resource" "sam_execute" {
 
  provisioner "local-exec" {
 
-    command = "/bin/bash ../../lambdas/rocketchat-notification/auto.sh"
+    command = "/bin/bash ../../lambdas/rocketchat-notification/build.sh"
   }
 }
 
