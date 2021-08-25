@@ -13,9 +13,9 @@ from datetime import date
 
 
 webHookUrlValues = os.getenv("IncomingWebHookUrl")
-ParentId = os.getenv("ParentId")
+ParentId = os.getenv("ParentId") 
 
-client = boto3.client("organizations", region_name="ca-central-1")
+client = boto3.client("organizations", region_name="ca-central-1") 
 
 
 def setup_default_logging(request_id, level=logging.INFO):
@@ -60,7 +60,7 @@ def handler(event, context):
         if webHookUrlValues != None:
             channels = webHookUrlValues.split(
                 ","
-            )  # "core_high=link1,core_low=link2,link3" -> [lin1,lin2]
+            )  
             webHookUrlLookup = {}
 
             for channel in channels:
@@ -109,13 +109,13 @@ def handler(event, context):
             else:
                 logging.getLogger().info("has security hub findings")
                 # Security Hub Findings
-                response = client.list_accounts_for_parent(ParentId)
+                response = client.list_accounts_for_parent(ParentId=ParentId) 
                     
-                 # os.getenv('ParentId')
+                 
                 core_accounts = []
 
-                for account in response["Accounts"]:
-                    core_accounts.append(account["Id"])
+                for acc in response["Accounts"]:
+                    core_accounts.append(acc["Id"])
 
                 for finding in event["detail"]["findings"]:
 
@@ -132,21 +132,21 @@ def handler(event, context):
                     findingTime = finding["UpdatedAt"]
                     lastObservedAt = finding.get(
                         "LastObservedAt", None
-                    )  # finding["LastObservedAt"]
+                    )  
                     account = finding["AwsAccountId"]
-                    region = finding["Resources"][0].get("Region", None)
+                    region = finding["Resources"][0].get("Region", None) 
                     resourceType = finding["Resources"][0]["Type"]
                     messageId = finding["Id"]
-                    resourceAccount = finding["ProductFields"]["ResourceOwnerAccount"]
+                    
 
                     lastSeen = findingTime
 
                     colour = "#7CD197"
                     severity = ""
-                    if resourceAccount in core_accounts:
-                        accoutType = "CORE"
-                    else:
-                        accountType = "WORK"
+                    if account in core_accounts:   
+                        accountType = "core"   
+                    else: 
+                        accountType = "workload" 
                     severityNormalized = finding["Severity"]["Normalized"]
 
                     if 1 <= severityNormalized and severityNormalized <= 39:
@@ -206,10 +206,11 @@ def handler(event, context):
                         ),
                         "attachments": attachment,
                     }
-
-                    if "{0}_{1}".format(accountType, severity) in webHookUrlLookup:
+                    
+                    if accountType in webHookUrlLookup: 
+                       
                         response = requests.post(
-                            webHookUrlLookup["{0}_{1}".format(accountType, severity)],
+                            webHookUrlLookup["{0}".format(accountType)], 
                             data=json.dumps(rocketChatMessage),
                             headers={"Content-Type": "application/json"},
                         )

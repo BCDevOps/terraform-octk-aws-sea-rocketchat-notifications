@@ -48,6 +48,11 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_writeonly" {
 }
 
 
+resource "aws_iam_role_policy_attachment" "lambda_org_list_accounts" {
+  role       = aws_iam_role.security_hub_to_rocketchat_role.name
+  policy_arn = aws_iam_policy.org_policy.arn
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
   role       = aws_iam_role.security_hub_to_rocketchat_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -57,7 +62,7 @@ resource "null_resource" "sam_execute" {
 
  provisioner "local-exec" {
 
-    command = "/bin/bash ../../lambdas/rocketchat-notification/build.sh"
+    command = "/bin/bash ../../terraform/aws/build.sh"
   }
 }
 
@@ -77,7 +82,8 @@ resource "aws_lambda_function" "findings_to_rocketchat" {
   environment {
     variables = {
       IncomingWebHookUrl = var.IncomingWebHookUrl,
-      LOG_LEVEL = var.LambdaEnvLogLevel
+      LOG_LEVEL = var.LambdaEnvLogLevel,
+      ParentId = var.ParentId
     }
   }
 
@@ -167,4 +173,50 @@ data "aws_iam_policy_document" "sns_topic_policy" {
       aws_sns_topic.rocketchat_alert_topic.arn,
     ]    
   }
+}
+
+
+
+
+resource "aws_iam_policy" "org_policy" {
+  name        = "org_list_accounts"
+  path        = "/"
+  description = "list accounts"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "organizations:ListPoliciesForTarget",
+                "organizations:DescribeEffectivePolicy",
+                "organizations:ListRoots",
+                "organizations:ListTargetsForPolicy",
+                "organizations:ListTagsForResource",
+                "organizations:ListDelegatedServicesForAccount",
+                "organizations:DescribeAccount",
+                "organizations:ListAWSServiceAccessForOrganization",
+                "organizations:DescribePolicy",
+                "organizations:ListChildren",
+                "organizations:ListPolicies",
+                "organizations:ListAccountsForParent",
+                "organizations:ListHandshakesForOrganization",
+                "organizations:ListDelegatedAdministrators",
+                "organizations:ListHandshakesForAccount",
+                "organizations:ListAccounts",
+                "organizations:ListCreateAccountStatus",
+                "organizations:DescribeOrganization",
+                "organizations:DescribeOrganizationalUnit",
+                "organizations:ListParents",
+                "organizations:ListOrganizationalUnitsForParent",
+                "organizations:DescribeHandshake",
+                "organizations:DescribeCreateAccountStatus"
+            ],
+            "Resource": "*"
+        }
+    ]
+  })
 }

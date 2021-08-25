@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "IncomingWebHookUrl" {
     type        = string
-    description = "Rocketchat Incoming Web Hook Urls. Should be in a delimited list of SEVERITY=https://webhookurl,SEVERITY=https://webhookurl,..."
+    description = "Rocketchat Incoming Web Hook Urls. Should be based on account-type=https://webhookurl,type=https://webhookurl,..."
 }
 
 variable "LambdaEnvLogLevel" {
@@ -17,4 +17,8 @@ variable "LambdaEnvLogLevel" {
 variable "LambdaTimeout" {
     type    = number
     default = 30
+}
+
+variable "ParentId" {
+    type = string
 }
