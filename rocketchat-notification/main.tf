@@ -62,14 +62,14 @@ resource "null_resource" "sam_execute" {
 
  provisioner "local-exec" {
 
-    command = "/bin/bash ../../terraform/aws/build.sh"
+    command = "/bin/bash ./build.sh"
   }
 }
 
 # Lambda
 resource "aws_lambda_function" "findings_to_rocketchat" {
   depends_on = ["null_resource.sam_execute"]
-  filename      = "/builds/securityhubfindings-to-rocketchat.zip"
+  filename      = "./builds/securityhubfindings-to-rocketchat.zip"
   function_name = "sea-send-securityhubfindings-to-rocketchat"
   role          = aws_iam_role.security_hub_to_rocketchat_role.arn
   handler       = "index.handler"
