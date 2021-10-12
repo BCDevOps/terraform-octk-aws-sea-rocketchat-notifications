@@ -15,6 +15,7 @@ locals {
   common_tags = {
     Project = "Rocketchat Notifications"   
   }  
+  lambda_src_path = "./lambda"
 }
 
 
@@ -58,26 +59,56 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "null_resource" "sam_execute" {
-
- provisioner "local-exec" {
-
-    command = "/bin/bash ./build.sh"
+resource "random_uuid" "lambda_src_hash" {
+  keepers = {
+    for filename in setunion(
+      fileset(local.lambda_src_path, "*.py"),
+      fileset(local.lambda_src_path, "requirements.txt"),
+      fileset(local.lambda_src_path, "core/**/*.py")
+    ):
+    filename => filemd5("${local.lambda_src_path}/${filename}")
   }
+}
+resource "null_resource" "install_dependencies" {
+  provisioner "local-exec" {
+    command = "pip3 install -r ${local.lambda_src_path}/requirements.txt -t ${local.lambda_src_path}/ --upgrade"
+  }
+    # Only re-run this if the dependencies or their versions
+  # have changed since the last deployment with Terraform
+  triggers = {
+    dependencies_versions = filemd5("${local.lambda_src_path}/requirements.txt")
+     
+  }
+}
+# Create an archive form the Lambda source code,
+# filtering out unneeded files.
+data "archive_file" "lambda_source_package" {
+  type        = "zip"
+  source_dir  = local.lambda_src_path
+  output_path = "${path.module}/.tmp/${random_uuid.lambda_src_hash.result}.zip"
+
+  excludes    = [
+    "__pycache__",
+    "core/__pycache__",
+    "tests"
+  ]
+
+  # This is necessary, since archive_file is now a
+  # `data` source and not a `resource` anymore.
+  # Use `depends_on` to wait for the "install dependencies"
+  # task to be completed.
+  depends_on = [null_resource.install_dependencies]
 }
 
 # Lambda
 resource "aws_lambda_function" "findings_to_rocketchat" {
-  depends_on = ["null_resource.sam_execute"]
-  filename      = "./builds/securityhubfindings-to-rocketchat.zip"
+  filename = data.archive_file.lambda_source_package.output_path
   function_name = "sea-send-securityhubfindings-to-rocketchat"
   role          = aws_iam_role.security_hub_to_rocketchat_role.arn
   handler       = "index.handler"
-  
-
-  
   runtime = "python3.8"
   timeout = var.LambdaTimeout
+  source_code_hash = data.archive_file.lambda_source_package.output_base64sha256
 
   environment {
     variables = {
