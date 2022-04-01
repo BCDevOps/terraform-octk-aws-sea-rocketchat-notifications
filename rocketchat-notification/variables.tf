@@ -19,6 +19,9 @@ variable "LambdaTimeout" {
   default = 30
 }
 
-variable "ParentId" {
+variable "security_ou_id" {
+  type = string
+}
+variable "infrastructure_ou_id" {
   type = string
 }
