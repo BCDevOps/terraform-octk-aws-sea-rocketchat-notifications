@@ -13,7 +13,8 @@ from datetime import date
 
 
 webHookUrlValues = os.getenv("IncomingWebHookUrl")
-ParentId = os.getenv("ParentId")
+security_ou_id = os.getenv("security_ou_id")
+infrastructure_ou_id = os.getenv("infrastructure_ou_id")
 
 client = boto3.client("organizations", region_name="ca-central-1")
 
@@ -138,11 +139,13 @@ def handler(event, context):
             else:
                 logging.getLogger().info("has security hub findings")
                 # Security Hub Findings
-                response = client.list_accounts_for_parent(ParentId=ParentId)
-
+                response = client.list_accounts_for_parent(security_ou_id=security_ou_id)
+                response1 = client.list_accounts_for_parent(infrastructure_ou_id=infrastructure_ou_id)
                 core_accounts = []
 
                 for acc in response["Accounts"]:
+                    core_accounts.append(acc["Id"])
+                for acc in response1["Accounts"]:
                     core_accounts.append(acc["Id"])
 
                 for finding in event["detail"]["findings"]:

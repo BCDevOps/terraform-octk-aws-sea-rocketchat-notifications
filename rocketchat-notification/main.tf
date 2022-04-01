@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 2.70"
-    }
-  }
-}
 provider "aws" {
   region = var.aws_region
 }
@@ -115,7 +107,8 @@ resource "aws_lambda_function" "findings_to_teams_rocketchat" {
     variables = {
       IncomingWebHookUrl = var.IncomingWebHookUrl,
       LOG_LEVEL          = var.LambdaEnvLogLevel,
-      ParentId           = var.ParentId
+      security_ou_id           = var.security_ou_id,
+      infrastructure_ou_id          = var.infrastructure_ou_id
     }
   }
 
