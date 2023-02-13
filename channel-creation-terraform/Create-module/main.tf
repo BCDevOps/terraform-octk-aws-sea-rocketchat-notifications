@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     restapi = {
-      source = "fmontezuma/restapi"
+      source  = "fmontezuma/restapi"
       version = "1.14.1"
     }
   }
@@ -12,23 +12,23 @@ provider "restapi" {
   uri                  = "https://chat.developer.gov.bc.ca/"
   debug                = true
   write_returns_object = true
-  
+
   headers = {
     X-Auth-Token = var.SECRET_TOKEN
-    X-User-Id = var.X-User-Id
+    X-User-Id    = var.X-User-Id
     Content-Type = "application/json"
   }
-  
- 
+
+
 }
 
 # export TF_VAR_SECRET_TOKEN=$(some_special_thing_to_get_credential)
 
 resource "restapi_object" "create_channel" {
-  provider = restapi.restapi_headers
+  provider     = restapi.restapi_headers
   path         = "/api/v1/channels.create"
   id_attribute = var.ID
-  object_id    = var.ID 
+  object_id    = var.ID
   data         = <<EOF
 {
   "name": "${var.name}",
