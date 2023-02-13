@@ -105,10 +105,10 @@ resource "aws_lambda_function" "findings_to_teams_rocketchat" {
 
   environment {
     variables = {
-      IncomingWebHookUrl = var.IncomingWebHookUrl,
-      LOG_LEVEL          = var.LambdaEnvLogLevel,
-      security_ou_id           = var.security_ou_id,
-      infrastructure_ou_id          = var.infrastructure_ou_id
+      IncomingWebHookUrl   = var.IncomingWebHookUrl,
+      LOG_LEVEL            = var.LambdaEnvLogLevel,
+      security_ou_id       = var.security_ou_id,
+      infrastructure_ou_id = var.infrastructure_ou_id
     }
   }
 
