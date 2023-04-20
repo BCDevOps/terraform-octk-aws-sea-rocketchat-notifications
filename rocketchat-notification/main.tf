@@ -10,7 +10,7 @@ locals {
   lambda_src_path = "./lambda"
 }
 
-
+data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "security_hub_notifications_role" {
   name               = "security_hub_notifications_role"
@@ -105,10 +105,9 @@ resource "aws_lambda_function" "findings_to_teams_rocketchat" {
 
   environment {
     variables = {
-      IncomingWebHookUrl = var.IncomingWebHookUrl,
       LOG_LEVEL          = var.LambdaEnvLogLevel,
-      security_ou_id           = var.security_ou_id,
-      infrastructure_ou_id          = var.infrastructure_ou_id
+      ParentId           = var.ParentId,
+      ParentId1          = var.ParentId1
     }
   }
 
@@ -241,6 +240,12 @@ resource "aws_iam_policy" "org_list_policy" {
           "organizations:DescribeCreateAccountStatus"
         ],
         "Resource" : "*"
+      },
+      {
+        Action   = "ssm:GetParameter"
+        Effect   = "Allow"
+        Resource = "arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/ecf/channels/webhooks"
+        Sid      = "Allowssmgetparameter"
       }
     ]
   })

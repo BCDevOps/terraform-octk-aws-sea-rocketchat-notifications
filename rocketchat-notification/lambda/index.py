@@ -11,10 +11,13 @@ from os import environ
 from datetime import datetime
 from datetime import date
 
-
-webHookUrlValues = os.getenv("IncomingWebHookUrl")
-security_ou_id = os.getenv("security_ou_id")
-infrastructure_ou_id = os.getenv("infrastructure_ou_id")
+import boto3
+ssm = boto3.client('ssm')
+parameter = ssm.get_parameter(Name='/ecf/channels/webhooks', WithDecryption=True)
+print(parameter['Parameter']['Value'])
+webHookUrlValues = parameter['Parameter']['Value']
+ParentId = os.getenv("ParentId")
+ParentId1 = os.getenv("ParentId1")
 
 client = boto3.client("organizations", region_name="ca-central-1")
 
@@ -139,8 +142,9 @@ def handler(event, context):
             else:
                 logging.getLogger().info("has security hub findings")
                 # Security Hub Findings
-                response = client.list_accounts_for_parent(security_ou_id=security_ou_id)
-                response1 = client.list_accounts_for_parent(infrastructure_ou_id=infrastructure_ou_id)
+                response = client.list_accounts_for_parent(ParentId=ParentId)
+                response1 = client.list_accounts_for_parent(ParentId=ParentId1)
+
                 core_accounts = []
 
                 for acc in response["Accounts"]:
@@ -278,7 +282,7 @@ def handler(event, context):
                         ],
                     }
                     for key, value in webHookUrlLookup.items():
-                        if accountType in key:
+                        if accountType in key and severity in key:
                             if "teams" in key:
                                 response = requests.post(
                                     webHookUrlLookup["{0}".format(key)],
