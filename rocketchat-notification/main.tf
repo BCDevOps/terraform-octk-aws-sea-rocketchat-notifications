@@ -105,9 +105,9 @@ resource "aws_lambda_function" "findings_to_teams_rocketchat" {
 
   environment {
     variables = {
-      LOG_LEVEL          = var.LambdaEnvLogLevel,
-      ParentId           = var.ParentId,
-      ParentId1          = var.ParentId1
+      LOG_LEVEL = var.LambdaEnvLogLevel,
+      ParentId  = var.ParentId,
+      ParentId1 = var.ParentId1
     }
   }
 
