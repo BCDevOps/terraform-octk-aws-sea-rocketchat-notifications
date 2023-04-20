@@ -1,25 +1,25 @@
 variable "ID" {
-    type = string
-    
+  type = string
+
 }
 
 variable "SECRET_TOKEN" {
-    type = string 
-    
+  type = string
+
 }
 
 variable "X-User-Id" {
-    type = string
-    
+  type = string
+
 }
 variable "name1" {
-    type = string
-} 
+  type = string
+}
 
 variable "ID1" {
-    type = string
+  type = string
 }
 
 variable "name2" {
-    type = string
-} 
+  type = string
+}
