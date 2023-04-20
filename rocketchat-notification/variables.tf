@@ -3,12 +3,6 @@ variable "aws_region" {
   description = "The AWS region things are created in"
   default     = "ca-central-1"
 }
-
-variable "IncomingWebHookUrl" {
-  type        = string
-  description = "Teams Incoming Web Hook Urls. Should be based on account-type=https://webhookurl,type=https://webhookurl,..."
-}
-
 variable "LambdaEnvLogLevel" {
   type    = string
   default = "INFO"
@@ -19,9 +13,9 @@ variable "LambdaTimeout" {
   default = 30
 }
 
-variable "security_ou_id" {
+variable "ParentId" {
   type = string
 }
-variable "infrastructure_ou_id" {
+variable "ParentId1" {
   type = string
 }
