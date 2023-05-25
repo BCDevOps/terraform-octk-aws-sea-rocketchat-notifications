@@ -6,6 +6,7 @@ import requests
 import time
 import os
 import math
+import re
 import urllib.parse
 from os import environ
 from datetime import datetime
@@ -175,10 +176,25 @@ def handler(event, context):
 
                     colour = "#7CD197"
                     severity = ""
+                    
                     if account in core_accounts:
-                        accountType = "core"
+                        match = re.findall(r'arn:aws:\w+:.?:(\d{12})', findingDescription)
+                        if match:
+                            account_number = match[1]
+                            logging.getLogger().info(account_number)
+                            if account_number in core_accounts:
+                                    logging.getLogger().info("Case account number in core account")
+                                    accountType = "core"
+                            else:
+                                logging.getLogger().info("Case account number not core account")
+                                accountType = "workload"
+                        else:
+                            logging.getLogger().info("Case arn no match")
+                            accountType = "core"
                     else:
+                        logging.getLogger().info("case account id not in core account")
                         accountType = "workload"
+
                     severityNormalized = finding["Severity"]["Normalized"]
 
                     if 1 <= severityNormalized and severityNormalized <= 39:

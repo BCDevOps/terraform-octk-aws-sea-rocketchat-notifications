@@ -14,8 +14,10 @@ variable "LambdaTimeout" {
 }
 
 variable "ParentId" {
-  type = string
+  type        = string
+  description = "Id of the security group"
 }
 variable "ParentId1" {
-  type = string
+  type        = string
+  description = "Id of the Infrastructure group"
 }
